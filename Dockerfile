@@ -15,6 +15,9 @@ FROM nginx:latest
 # Copier le build Angular dans Nginx
 COPY --from=build /app/dist/khaddem-front /usr/share/nginx/html
 
+# Vérifier les permissions et les ajuster
+RUN chmod -R 755 /usr/share/nginx/html
+
 # Copier la configuration Nginx
 COPY default.conf /etc/nginx/conf.d/default.conf
 
