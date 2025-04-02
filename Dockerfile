@@ -1,17 +1,25 @@
+# Étape 1 : Construction de l'application Angular
 FROM node:16.17.0 as build
-WORKDIR /usr/local/app
-COPY . /usr/local/app/
-RUN npm install
+WORKDIR /app
+
+# Copier les fichiers source Angular
+COPY package.json package-lock.json ./
+RUN npm install --legacy-peer-deps
+
+COPY . .
 RUN npx ng build --configuration=production
 
+# Étape 2 : Configuration de Nginx pour servir l'application Angular
 FROM nginx:latest
-RUN rm -rf /usr/share/nginx/html/*
 
-# Copie le build Angular dans le répertoire Nginx
-COPY --from=build /usr/local/app/dist/khaddem-front /usr/share/nginx/html
+# Copier le build Angular dans Nginx
+COPY --from=build /app/dist/khaddem-front /usr/share/nginx/html
 
-# Copie la configuration de Nginx
-COPY default.conf /etc/nginx/conf.d
+# Copier la configuration Nginx
+COPY default.conf /etc/nginx/conf.d/default.conf
 
+# Exposer le port 80 pour accéder à l'application
 EXPOSE 80
+
+# Démarrer Nginx
 CMD ["nginx", "-g", "daemon off;"]
