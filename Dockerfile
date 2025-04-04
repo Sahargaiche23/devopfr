@@ -16,7 +16,7 @@ RUN npm config set fetch-retry-maxtimeout 60000 && \
 COPY . .
 
 # Exécuter la commande build pour créer la version de production de l'app
-RUN npm run build --configuration production
+RUN npm run build -- --configuration=production
 
 # Étape de production avec Nginx
 FROM nginx:alpine
