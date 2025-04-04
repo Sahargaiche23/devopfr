@@ -38,8 +38,9 @@ services:
     image: sahargaiche11/angular-app:latest
     restart: on-failure
     ports:
-    - "8888:80"  # 8888 sur ton host, 80 dans le conteneur    volumes:
-      - ./dist:/usr/share/nginx/html  # Volume pour servir le build Angular
+      - "8888:80"
+    volumes:
+      - ./dist:/usr/share/nginx/html
     networks:
       - frontend_network
 
@@ -47,7 +48,7 @@ services:
 volumes:
   khaddemApp:
 
-# Networks pour isoler les services
+# Réseaux pour isoler les services
 networks:
   frontend_network:
     driver: bridge
