@@ -40,7 +40,7 @@ services:
     ports:
       - "8888:80"
     volumes:
-      - ./dist:/usr/share/nginx/html
+      - ./dist/khaddem-front:/usr/share/nginx/html
     networks:
       - frontend_network
 
