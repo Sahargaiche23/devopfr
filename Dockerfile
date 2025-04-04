@@ -7,27 +7,25 @@ WORKDIR /usr/local/app
 # Copier les fichiers de dépendances
 COPY package*.json ./
 
-# Configuration npm pour les environnements derrière un proxy
-# ⚠️ Remplace "http://proxy:port" par ton vrai proxy
+# Installer les dépendances npm (avec configuration pour éviter les timeouts)
 RUN npm config set fetch-retry-maxtimeout 60000 && \
     npm config set fetch-timeout 60000 && \
-    npm config set proxy http://proxy:port && \
-    npm config set https-proxy http://proxy:port && \
-    npm config set strict-ssl false && \
     npm install
 
-# Copier le reste de l'application Angular
+# Copier tous les fichiers sources dans le conteneur
 COPY . .
 
-# Build Angular (ajuste selon ton script build si nécessaire)
-RUN npm run build --prod
+# Exécuter la commande build pour créer la version de production de l'app
+RUN npm run build --configuration production
 
 # Étape de production avec Nginx
 FROM nginx:alpine
-COPY --from=build /usr/local/app/dist/nom-de-ton-app /usr/share/nginx/html
 
-# Copier un fichier de config nginx personnalisé si tu en as un
-# COPY nginx.conf /etc/nginx/nginx.conf
+# Copier l'application construite à partir de l'étape de build vers Nginx
+COPY --from=build /usr/local/app/dist/khaddem-front /usr/share/nginx/html
 
+# Exposer le port 80 pour accéder à l'app
 EXPOSE 80
+
+# Démarrer Nginx en mode non-démon
 CMD ["nginx", "-g", "daemon off;"]
