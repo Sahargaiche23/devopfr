@@ -1,31 +1,26 @@
-# Étape de build
-FROM node:16.17.0 as build
+# Étape 1 : Build Angular
+FROM node:18 AS build
 
-# Dossier de travail dans le conteneur
-WORKDIR /usr/local/app
+WORKDIR /app
 
-# Copier les fichiers de dépendances
 COPY package*.json ./
+RUN npm install
 
-# Installer les dépendances npm (avec configuration pour éviter les timeouts)
-RUN npm config set fetch-retry-maxtimeout 60000 && \
-    npm config set fetch-timeout 60000 && \
-    npm install
-
-# Copier tous les fichiers sources dans le conteneur
 COPY . .
 
-# Exécuter la commande build pour créer la version de production de l'app
-RUN npm run build -- --configuration=production
+RUN npm run build -- --output-path=dist
 
-# Étape de production avec Nginx
+# Étape 2 : Serve avec http-server
 FROM nginx:alpine
 
-# Copier l'application construite à partir de l'étape de build vers Nginx
-COPY --from=build /usr/local/app/dist/khaddem-front /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Exposer le port 80 pour accéder à l'app
+# Suppression de la config par défaut de nginx
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Ajout de notre config nginx
+COPY nginx.conf /etc/nginx/conf.d
+
 EXPOSE 80
 
-# Démarrer Nginx en mode non-démon
 CMD ["nginx", "-g", "daemon off;"]
