@@ -38,8 +38,7 @@ services:
     image: sahargaiche11/angular-app:latest
     restart: on-failure
     ports:
-      - "80:80"
-
+    - "4200:80" # l'hôte écoute sur 4200, le conteneur sur 80
     volumes:
       - ./dist:/usr/share/nginx/html  # Volume pour servir le build Angular
     networks:
